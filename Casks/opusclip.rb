@@ -34,6 +34,16 @@ cask "opusclip" do
 
   binary "opusclip"
 
+  # The release binary is unsigned (Go ad-hoc/linker signature only). Homebrew
+  # tags downloads with com.apple.quarantine, and on Apple Silicon Gatekeeper
+  # SIGKILLs a quarantined unsigned Mach-O on first exec. Strip the quarantine
+  # attribute so `opusclip` runs straight after `brew install`.
+  postflight do
+    system_command "/usr/bin/xattr",
+                   args: ["-dr", "com.apple.quarantine", "#{staged_path}/opusclip"],
+                   sudo: false
+  end
+
   # No zap stanza required
 
 end
